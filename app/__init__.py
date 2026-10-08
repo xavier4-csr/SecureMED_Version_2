@@ -49,6 +49,11 @@ def create_app():
     app.register_blueprint(patient_bp)
     app.register_blueprint(responder_bp)
 
+    @app.get("/healthz")
+    def health_check():
+        """Minimal liveness endpoint for the synthetic demo."""
+        return {"status": "ok"}, 200
+
     @app.before_request
     def block_legacy_patient_routes_in_demo():
         """Keep the old database-backed prototype routes unreachable in demo."""

@@ -7,6 +7,13 @@ def make_client():
     return app.test_client()
 
 
+def test_health_endpoint_is_minimal():
+    response = make_client().get("/healthz")
+    assert response.status_code == 200
+    assert response.is_json
+    assert response.get_json() == {"status": "ok"}
+
+
 def test_home_redirects_to_demo():
     client = make_client()
     response = client.get("/")

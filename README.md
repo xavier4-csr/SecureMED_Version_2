@@ -1,199 +1,83 @@
-# SecureMed QR
+# SecureMed QR — V2 Presentation Demo
 
-> **Current status: synthetic-data demonstration only.** The running app redirects `/` to `/demo/` and serves a fabricated profile at `/demo/record`. It does not authenticate responders and must not be used with real patient data. The former database-backed registration/responder routes are blocked outside tests. The demo does not initialize or connect to the patient database. No clinical, security-compliance, or availability guarantee is made.
+> **Status: synthetic-data demo only.** This prototype illustrates a QR-linked emergency-profile concept. It is not a clinical service, does not authenticate responders, and must not be used for care or with real patient information.
 
-## Run the current demo
+## Current experience
 
-Install dependencies with `pip install -r requirements.txt`, then run `python run.py` and open `http://localhost:5000/`. To test QR scanning on a phone, set `BASE_URL` to a reachable HTTPS address before generating the QR. The demo uses fixed synthetic values and does not need a patient database.
+- `/` redirects to the demo landing page.
+- `/demo/` introduces the synthetic scenario and displays a QR code.
+- `/demo/record` presents fabricated allergy and medication examples, with emergency-contact context secondary.
+- `/demo/qr.png` serves the QR image.
+- `/healthz` returns a minimal liveness status for hosting health checks.
+- Legacy database-backed patient and responder routes return 404 outside tests.
 
-Current demo routes: `/demo/`, `/demo/qr.png`, and `/demo/record`. Run checks with `pytest -q`.
+The demo is static: it does not initialize or connect to a patient database, and it does not require Neon, Redis, or user accounts. The profile is hard-coded synthetic content. The QR is a public locator, not proof of responder identity. If the service is unavailable, do not infer that the person has no allergies or medications; follow established emergency procedures.
 
-> **Historical prototype documentation follows.** The descriptions below refer to the earlier database-backed OTP/encryption prototype; that flow is intentionally not exposed by the current demo and should not be relied on for a security or production claim.
+## Run locally
 
-A Flask-based emergency medical profile system with three layers of security:
-**AES-256-GCM encryption**, **TOTP one-time passwords**, and **SHA-256 record hashing**.
+Requires Python 3.11 or newer.
 
-Patients register once and carry a QR wristband or card. First responders scan
-the QR code, enter a time-limited OTP, and instantly see the critical medical
-info they need — blood type, allergies, conditions, emergency contacts.
-
----
-
-## How it works
-
-```
-Patient registers
-  → bcrypt password hash
-  → SHA-256 record fingerprint
-  → AES-256-GCM encryption (key derived via PBKDF2, never stored)
-  → TOTP secret generated
-  → QR code issued
-
-Responder scans QR
-  → OTP displayed (rotates every 30 sec)
-  → Responder enters OTP → verified server-side
-  → AES key re-derived → record decrypted
-  → SHA-256 hash verified (tamper detection)
-  → Critical info displayed for 10 minutes
-  → Every attempt logged to access_logs
-```
-
----
-
-## Security design
-
-| Layer | Technology | Purpose |
-|---|---|---|
-| Encryption | AES-256-GCM | Protects data at rest — ciphertext is useless without the key |
-| Key derivation | PBKDF2-HMAC-SHA256 (600k iterations) | Key never stored — re-derived from qr_id + salt on demand |
-| Access gate | TOTP (RFC 6238) | Time-limited 6-digit code, expires every 30 seconds |
-| Tamper detection | SHA-256 | Hash stored at registration, verified after every decryption |
-| Password storage | bcrypt (cost 12) | Patient account passwords hashed and salted |
-| Audit trail | MySQL access_logs | Every scan attempt logged with IP, timestamp, success/fail |
-
-**What is never stored:** plaintext records, plaintext passwords, AES keys, OTP codes.
-
----
-
-## Project structure
-
-```
-SecureMed-QR/
-├── run.py                        # Start the Flask dev server
-├── config.py                     # App configuration
-├── .env                          # Secret credentials (never commit)
-├── requirements.txt              # Pinned dependencies
-│
-├── app/
-│   ├── __init__.py               # App factory: init DB, register blueprints
-│   ├── routes/
-│   │   ├── patient.py            # /register, /qr/<id>, /dashboard
-│   │   └── responder.py          # /scan/<id>, /verify/<id>, /view/<id>
-│   ├── utils/
-│   │   ├── crypto.py             # AES-256-GCM encrypt/decrypt, PBKDF2
-│   │   ├── hashing.py            # SHA-256 hash and verify
-│   │   ├── otp.py                # TOTP generate and verify
-│   │   └── db.py                 # MySQL connection pool and helpers
-│   ├── templates/
-│   │   ├── base.html
-│   │   ├── patient/
-│   │   │   ├── register.html
-│   │   │   └── dashboard.html
-│   │   └── responder/
-│   │       ├── scan.html
-│   │       └── view.html
-│   └── static/
-│       └── css/main.css
-│
-└── tests/
-    ├── test_crypto.py
-    ├── test_hashing.py
-    ├── test_otp.py
-    └── test_routes.py
-```
-
----
-
-## Setup
-
-### Prerequisites
-- Python 3.11+
-- MySQL 8.0+ running locally
-
-### Install
-
-#### Windows (recommended)
-
-Use the provided script:
-
-```bat
-scripts\setup_and_run_windows.bat
-```
-
-#### Manual (Windows)
-
-```bat
-git clone <repo-url>
-cd SecureMed-QR
-
-python -m venv venv
-venv\Scripts\activate
-
+```bash
+python -m venv .venv
+source .venv/bin/activate       # Windows: .venv\\Scripts\\activate
 pip install -r requirements.txt
-```
-
-
-### Configure
-
-```bash
-cp .env.example .env
-```
-
-Edit `.env`:
-
-```env
-SECRET_KEY=replace-with-a-long-random-string-at-least-32-chars
-DB_HOST=localhost
-DB_PORT=3306
-DB_USER=root
-DB_PASSWORD=your_mysql_password
-DB_NAME=securemed
-```
-
-### Run
-
-```bash
 python run.py
 ```
 
-Open `http://localhost:5000/register`
+Open <http://localhost:5000/>. The local command uses Flask's development server; do not expose it as a public deployment. For a temporary phone test on the same network, set `BASE_URL` to a reachable address before generating the QR. Do not put real patient details or credentials in the demo.
 
-The database and tables are created automatically on first run.
-
----
-
-## Running tests
+## Tests
 
 ```bash
-pytest tests/test_crypto.py tests/test_hashing.py tests/test_otp.py -v
+pytest -q
 ```
 
----
+The test suite covers the demo landing/record/QR, the minimal health endpoint, no-cache response headers, and legacy-route blocking. It does not establish clinical safety or production readiness.
 
-## API endpoints
+## Render demo deployment
 
-| Method | Route | Description |
-|---|---|---|
-| GET | `/register` | Patient registration form |
-| POST | `/register` | Submit registration — runs full crypto pipeline |
-| GET | `/qr/<qr_id>` | Serve QR code as PNG image |
-| GET | `/dashboard` | Patient dashboard with QR and access log |
-| GET | `/logout` | Clear session |
-| GET | `/scan/<qr_id>` | Responder scans QR — shows OTP |
-| POST | `/verify/<qr_id>` | Responder submits OTP — decrypt and open session |
-| GET | `/view/<qr_id>` | Display decrypted medical record (session-gated) |
+The repository includes `render.yaml` for a low-cost synthetic demo web service:
 
----
+1. Create a Render Web Service from this repository and use the Blueprint settings.
+2. Keep `DEMO_MODE` enabled; the app currently sets it to `True`.
+3. Let Render generate `SECRET_KEY`; set the canonical public origin as `BASE_URL` if needed.
+4. Do not attach or configure a patient database or Redis for the current demo.
+5. After deployment, test `/healthz`, `/demo/`, `/demo/record`, `/demo/qr.png`, and verify `/register` and `/scan/demo` return 404.
 
-## Dependencies
+No Render deployment is currently implied by this repository. Verify the QR points to the intended HTTPS host before presenting it.
 
+## Safety boundary
+
+- Use fabricated values only; never upload, type, or demonstrate real patient or emergency-contact details.
+- QR possession does not authenticate a paramedic or authorize access to real records.
+- The demo gives no treatment recommendations and makes no legal, clinical, privacy-compliance, or availability claims.
+- “Emergency doctrine applies” is an unverified project assumption, not a conclusion about Kenyan law or clinical policy.
+- Any real-data pilot is a separate project gate requiring clinical, privacy/legal, security, identity, authorization, key-management, and operational review.
+
+## Project map
+
+```text
+app/
+  routes/        Flask routes: demo plus legacy routes blocked in demo mode
+  templates/     landing, synthetic record, and historical prototype views
+  utils/         legacy crypto/database/hash/OTP helpers (not used by demo routes)
+docs/
+  product-brief.md
+  user-flows.md
+  threat-model.md
+  FAST_TRACK_PRESENTATION_ROADMAP.md
+scripts/          local setup helper
+ tests/           pytest suite
+config.py         app configuration (demo mode remains on)
+render.yaml       Render web-service blueprint; no database required
+run.py            local entry point and Render external-host detection
 ```
-flask                  Web framework
-mysql-connector-python MySQL driver
-cryptography           AES-256-GCM, PBKDF2
-bcrypt                 Password hashing
-pyotp                  TOTP one-time passwords
-qrcode + pillow        QR code generation
-python-dotenv          Environment variable loading
-pytest                 Testing
-```
 
----
+## Working documents
 
-## Important notes
+- [Threat model](docs/threat-model.md)
+- [Fast-track presentation roadmap](docs/FAST_TRACK_PRESENTATION_ROADMAP.md)
+- [Product brief](docs/product-brief.md)
+- [User flows](docs/user-flows.md)
 
-- `instance/` and `.env` are in `.gitignore` — never commit them
-- The AES encryption key is derived at runtime and never persisted anywhere
-- Every access attempt (success or failure) is written to `access_logs`
-- OTP sessions expire after 10 minutes automatically
-- For production: use HTTPS, set a strong `SECRET_KEY`, and restrict DB user permissions
+The longer [production redesign roadmap](PRODUCTION_REDESIGN_ROADMAP.md) describes additional gates. Finishing a presentation demo does not make the system production-ready.
