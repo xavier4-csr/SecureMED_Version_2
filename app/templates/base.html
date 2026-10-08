@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="SecureMed QR synthetic-data prototype for exploring emergency profile handover.">
+  <title>{% block title %}SecureMed QR{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-inner">
+    <a class="nav-brand" href="{{ url_for('main.index') }}">
+      🏥 SecureMed QR
+    </a>
+    <div class="nav-links">
+      <a href="{{ url_for('demo.home') }}#limits" class="hide-mobile">Demo limits</a>
+      <a href="{{ url_for('demo.home') }}" class="btn btn-primary">Open demo</a>
+    </div>
+  </div>
+</nav>
+
+<div role="note" style="padding:.65rem 1rem;text-align:center;background:#fff7ed;color:#9a3412;border-bottom:1px solid #fed7aa;font-size:.9rem">
+  <strong>Synthetic demo only.</strong> Do not enter or use real patient information; this is not a clinical service.
+</div>
+
+<div class="{% block wrapper_class %}page-wrap container{% endblock %}">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  {% block content %}{% endblock %}
+</div>
+
+<footer class="footer">
+  <p>© 2026 SecureMed QR &nbsp;·&nbsp;
+     Synthetic-data prototype &nbsp;·&nbsp;
+     <a href="{{ url_for('demo.home') }}#limits">Demo limitations</a>
+  </p>
+</footer>
+
+<script>
+// 3D tilt on hover
+document.querySelectorAll('.tilt-card').forEach(card => {
+  card.addEventListener('mousemove', e => {
+    const r = card.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width - 0.5;
+    const y = (e.clientY - r.top) / r.height - 0.5;
+    card.style.setProperty('--ry', (x * 12) + 'deg');
+    card.style.setProperty('--rx', (y * -12) + 'deg');
+  });
+  card.addEventListener('mouseleave', () => {
+    card.style.setProperty('--rx', '0deg');
+    card.style.setProperty('--ry', '0deg');
+  });
+});
+
+// Scroll reveal
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('is-visible');
+      revealObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.15 });
+document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+</script>
+
+</body>
+</html>

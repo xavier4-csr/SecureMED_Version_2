@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — SecureMed QR{% endblock %}
+
+{% block content %}
+<div style="padding: 2.5rem 0">
+<div class="card reveal">
+  <h1 class="card-title">Welcome, {{ full_name }} 👋</h1>
+  <p class="card-sub">Your medical profile is encrypted and ready. Print or save your QR code — carry it on a wristband, wallet card, or keep it on your phone.</p>
+
+  <div class="qr-section">
+    <div class="tilt-card" style="display:inline-block;border-radius:var(--radius-lg)">
+      <div class="tilt-card-inner">
+        <img src="{{ url_for('patient.qr_image', qr_id=qr_id) }}"
+             alt="Your SecureMed QR code"
+             class="qr-image">
+      </div>
+    </div>
+
+    <div class="qrid-box">
+      <div class="qrid-label">Your QR ID (needed to log in)</div>
+      <div class="qrid-value" id="qridValue">{{ qr_id }}</div>
+      <button type="button" class="btn btn-outline btn-sm" onclick="copyQrId()">📋 Copy</button>
+    </div>
+
+    <div style="display:flex;gap:.75rem;flex-wrap:wrap;justify-content:center">
+      <a href="{{ url_for('patient.qr_image', qr_id=qr_id) }}"
+         download="securemed-qr.png"
+         class="btn btn-primary">⬇ Download QR code</a>
+    </div>
+  </div>
+
+  <div style="background:var(--blue-50);border:1px solid var(--blue-100);border-radius:var(--radius);padding:12px 16px;margin-top:1rem;font-size:13px;color:var(--blue-800)">
+    <strong>How to use:</strong> A first responder scans this QR code, enters the 6-digit one-time code displayed on screen, and immediately sees your critical medical information. No app required on their end.
+  </div>
+</div>
+
+<div class="card reveal reveal-delay-1">
+  <h2 class="card-title" style="font-size:17px">Recent access log</h2>
+  <p class="card-sub" style="margin-bottom:1rem">Every scan attempt is recorded — successful or not.</p>
+  {% if logs %}
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Date &amp; time</th>
+          <th>Responder IP</th>
+          <th>Result</th>
+          <th>Note</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for log in logs %}
+        <tr>
+          <td>{{ log.accessed_at.strftime('%Y-%m-%d %H:%M') if log.accessed_at else '—' }}</td>
+          <td>{{ log.responder_ip }}</td>
+          <td>
+            {% if log.success %}
+              <span class="badge badge-success">✓ Verified</span>
+            {% elif log.failure_reason == 'otp_pending' %}
+              <span class="badge badge-pending">Pending OTP</span>
+            {% else %}
+              <span class="badge badge-danger">✗ Failed</span>
+            {% endif %}
+          </td>
+          <td class="text-sm text-muted">{{ log.failure_reason or "—" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="text-muted text-sm">No access attempts recorded yet.</p>
+  {% endif %}
+</div>
+</div>
+<script>
+function copyQrId() {
+  const text = document.getElementById('qridValue').innerText;
+  const btn = event.target;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.innerText = '✓ Copied';
+    setTimeout(() => { btn.innerText = '📋 Copy'; }, 1500);
+  });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Synthetic Demo Record — SecureMed QR{% endblock %}
+{% block content %}
+<section style="padding:2rem 1rem;background:var(--gray-50);min-height:75vh">
+  <div style="max-width:760px;margin:0 auto">
+    <div role="note" style="background:#fff7ed;border:1px solid #fdba74;color:#9a3412;border-radius:12px;padding:1rem;margin-bottom:1rem">
+      <strong>SYNTHETIC DEMO — NOT FOR MEDICAL CARE</strong>
+      <div>This record is fabricated. The QR does not verify the viewer's identity. Do not use real patient information.</div>
+    </div>
+
+    <div id="offlineNotice" role="alert" hidden style="background:#fef2f2;border:1px solid #fecaca;color:#991b1b;border-radius:12px;padding:1.25rem;margin-bottom:1rem">
+      <strong>Cannot load profile.</strong> Treat information as unknown and follow your established emergency process. This demo does not store medical details offline.
+    </div>
+
+    <article id="recordContent" class="card" aria-labelledby="record-title" style="max-width:none">
+      <p class="section-eyebrow">Handover-oriented synthetic example</p>
+      <h1 class="card-title" id="record-title">{{ record.display_name }}</h1>
+      <p class="card-sub">No patient identity is included. This example is not verified and does not provide treatment advice.</p>
+
+      <section aria-labelledby="allergy-title" style="padding:1rem;margin:1rem 0;border-left:4px solid #b91c1c;background:#fff7f7;border-radius:8px">
+        <h2 id="allergy-title" style="font-size:1.15rem;margin:0 0 .5rem">Allergy status</h2>
+        <p style="font-size:1.05rem;margin:.25rem 0">{{ record.allergies }}</p>
+        <p class="text-sm text-muted" style="margin:.5rem 0 0">Source/status: {{ record.provenance }} · Updated: {{ record.freshness }}</p>
+      </section>
+
+      <section aria-labelledby="meds-title" style="padding:1rem;margin:1rem 0;border-left:4px solid #1d4ed8;background:#eff6ff;border-radius:8px">
+        <h2 id="meds-title" style="font-size:1.15rem;margin:0 0 .5rem">Key medication information</h2>
+        <ul style="margin:.25rem 0;padding-left:1.25rem">
+          {% for item in record.medications %}<li style="margin:.35rem 0">{{ item }}</li>{% endfor %}
+        </ul>
+        <p class="text-sm text-muted" style="margin:.5rem 0 0">Source/status: {{ record.provenance }} · Updated: {{ record.freshness }}</p>
+      </section>
+
+      <section aria-labelledby="contact-title" style="padding:1rem;margin:1rem 0;background:#f8fafc;border-radius:8px">
+        <h2 id="contact-title" style="font-size:1rem;margin:0 0 .5rem">Secondary — emergency contact</h2>
+        <p style="margin:.25rem 0">{{ record.emergency_contact }}</p>
+      </section>
+
+      <p class="text-sm text-muted" style="margin-top:1rem">This page is served online with cache-prevention headers. No cached medical details are available offline. If this profile cannot be reached, do not infer that the patient has no allergies or medications.</p>
+      <a href="{{ url_for('demo.home') }}" class="btn btn-outline" style="margin-top:.5rem">Back to demo</a>
+    </article>
+  </div>
+</section>
+<script>
+(() => {
+  const record = document.getElementById('recordContent');
+  const notice = document.getElementById('offlineNotice');
+  const showOffline = () => {
+    record.hidden = true;
+    notice.hidden = false;
+  };
+  if (!navigator.onLine) showOffline();
+  window.addEventListener('offline', showOffline);
+  window.addEventListener('online', () => window.location.reload());
+})();
+</script>
+{% endblock %}

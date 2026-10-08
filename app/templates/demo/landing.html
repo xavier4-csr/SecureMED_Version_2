@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Synthetic Demo — SecureMed QR{% endblock %}
+{% block content %}
+<section class="hero" style="padding-bottom:1.5rem">
+  <div class="hero-badge">Synthetic-data prototype</div>
+  <h1 class="hero-title">Emergency profile access,<br>explored as a demo</h1>
+  <p class="hero-sub">This prototype tests whether a QR-linked profile can make allergy and key-medication information easier to find during handover. It is not a clinical service and must not be used for care.</p>
+  <div class="hero-actions">
+    <a href="{{ url_for('demo.record') }}" class="btn btn-primary btn-lg">Open synthetic record</a>
+    <a href="#limits" class="btn btn-ghost btn-lg">Read demo limitations</a>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="scan-title">
+  <div class="card" style="max-width:720px;margin:0 auto;text-align:center">
+    <h2 class="card-title" id="scan-title">Try scanning the demo QR</h2>
+    <p class="card-sub">Use a phone camera to open the same fabricated profile. The QR is a locator only; it does not verify who scans it.</p>
+    <img src="{{ url_for('demo.qr_image') }}" alt="QR code linking to the SecureMed QR synthetic demo record" width="240" height="240" style="display:block;margin:1.25rem auto;border:1px solid #e5e7eb;border-radius:12px;padding:12px;background:#fff">
+    <a href="{{ url_for('demo.record') }}">Open the demo record on this device</a>
+  </div>
+</section>
+
+<section class="section section-alt" id="limits">
+  <div class="section-eyebrow">Prototype boundaries</div>
+  <h2 class="section-title">What this demo does—and does not—show</h2>
+  <div class="steps-grid">
+    <article class="step-card"><div class="step-card-inner">
+      <h3>Fabricated data only</h3>
+      <p>The profile is hard-coded synthetic content. Do not enter or upload real patient details.</p>
+    </div></article>
+    <article class="step-card"><div class="step-card-inner">
+      <h3>No responder authentication</h3>
+      <p>Anyone with the QR can open the demo. QR possession does not establish responder identity.</p>
+    </div></article>
+    <article class="step-card"><div class="step-card-inner">
+      <h3>No offline medical record</h3>
+      <p>The demo requires a network connection and does not cache the profile for offline use.</p>
+    </div></article>
+  </div>
+  <p class="section-sub" style="margin-top:1.5rem">The demo contains no treatment recommendations and is not validated for clinical or emergency use. Follow established emergency procedures.</p>
+</section>
+{% endblock %}

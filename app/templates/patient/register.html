@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Register — SecureMed QR{% endblock %}
+
+{% block content %}
+<div style="padding: 2.5rem 0">
+<div class="card reveal">
+  <h1 class="card-title">Create your medical profile</h1>
+<p class="card-sub">Your data is encrypted with AES-256 before it is stored. Only a valid QR scan and one-time password can unlock it.</p>
+
+  <form method="POST" action="{{ url_for('patient.register_submit') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <div class="section-label">Personal information</div>
+    <div class="form-group">
+      <label for="full_name">Full name</label>
+      <input type="text" id="full_name" name="full_name" required placeholder="Name">
+    </div>
+    <div class="form-group">
+      <label for="blood_type">Blood type</label>
+      <select id="blood_type" name="blood_type" required>
+        <option value="">— select your blood type —</option>
+        {% for bt in ["A+","A-","B+","B-","AB+","AB-","O+","O-"] %}
+          <option value="{{ bt }}">{{ bt }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="section-label">Medical information</div>
+    <div class="form-group">
+      <label for="allergies">Allergies</label>
+      <textarea id="allergies" name="allergies" rows="2" placeholder="e.g. Penicillin, Latex, Aspirin"></textarea>
+      <span class="form-hint">Leave blank if none. Separate multiple allergies with commas.</span>
+    </div>
+    <div class="form-group">
+      <label for="conditions">Chronic conditions</label>
+      <textarea id="conditions" name="conditions" rows="2" placeholder="e.g. Type 2 Diabetes, Asthma, Hypertension"></textarea>
+      <span class="form-hint">Leave blank if none.</span>
+    </div>
+    <div class="form-group">
+      <label for="medications">Current medications</label>
+      <textarea id="medications" name="medications" rows="2" placeholder="e.g. Metformin 500mg twice daily, Salbutamol inhaler"></textarea>
+      <span class="form-hint">Leave blank if none.</span>
+    </div>
+
+    <div class="section-label">Emergency contact</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="emergency_name">Contact name</label>
+        <input type="text" id="emergency_name" name="emergency_name" required placeholder="contact name">
+      </div>
+      <div class="form-group">
+        <label for="emergency_phone">Contact phone</label>
+        <input type="tel" id="emergency_phone" name="emergency_phone" required placeholder="+254 700 000 000">
+      </div>
+    </div>
+
+    <div class="section-label">Account security</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required minlength="8" placeholder="Min 8 characters">
+      </div>
+      <div class="form-group">
+        <label for="confirm_password">Confirm password</label>
+        <input type="password" id="confirm_password" name="confirm_password" required placeholder="Repeat password">
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-block">Create profile &amp; generate my QR code →</button>
+  </form>
+</div>
+<p class="text-center text-sm text-muted mt-1">
+  🔒 Your data is encrypted before storage. We never store your medical record in plaintext.
+</p>
+</div>
+{% endblock %}

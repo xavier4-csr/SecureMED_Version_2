@@ -1,0 +1,19 @@
+# Virtual environment
+venv/
+.venv/
+
+# Database (contains encrypted patient data — never commit)
+instance/
+
+# Environment secrets
+.env
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# OS
+.DS_Store
+Thumbs.db

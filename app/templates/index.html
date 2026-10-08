@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block title %}SecureMed QR — Emergency Medical Profiles{% endblock %}
+
+{% block content %}
+
+<!-- Hero -->
+<section class="hero">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="hero-badge">🏥 Trusted Emergency Medical Access</div>
+  <h1 class="hero-title">Your medical history,<br>ready when seconds matter</h1>
+  <p class="hero-sub">SecureMed QR stores your emergency medical profile behind military-grade encryption. First responders unlock it instantly with a QR scan and one-time password — no app required.</p>
+  <div class="hero-actions">
+    <a href="{{ url_for('patient.register_form') }}" class="btn btn-primary btn-lg">Create your profile — it's free</a>
+    <a href="#how-it-works" class="btn btn-ghost btn-lg">See how it works</a>
+  </div>
+  <div class="hero-trust">
+    <span>🔒 AES-256 encrypted</span>
+    <span>⏱ 30-second OTP</span>
+    <span>🛡 SHA-256 tamper detection</span>
+    <span>📋 Access logged</span>
+  </div>
+</section>
+
+<!-- Stats bar -->
+<div class="stats-bar reveal">
+  <div class="stat reveal reveal-delay-1"><div class="stat-num">3</div><div class="stat-label">Security layers</div></div>
+  <div class="stat-div"></div>
+  <div class="stat"><div class="stat-num">&lt;30s</div><div class="stat-label">Time to unlock</div></div>
+  <div class="stat-div"></div>
+<div class="stat reveal reveal-delay-3"><div class="stat-num">0</div><div class="stat-label">Plaintext stored</div></div>
+  <div class="stat-div"></div>
+  <div class="stat reveal reveal-delay-3"><div class="stat-num">10min</div><div class="stat-label">Session window</div></div>
+</div>
+
+<!-- How it works -->
+<section class="section" id="how-it-works">
+  <div class="section-eyebrow">How it works</div>
+  <h2 class="section-title">Simple for patients. Fast for responders.</h2>
+
+<div class="steps-grid">
+    <div class="step-card tilt-card reveal">
+      <div class="tilt-card-inner">
+      <div class="step-icon" style="background:#EFF6FF;color:#1D4ED8">📝</div>
+      <div class="step-num">01</div>
+      <h3>Register once</h3>
+      <p>Fill in your blood type, allergies, conditions, medications and emergency contact. Takes under 2 minutes.</p>
+      </div>
+    </div>
+    <div class="step-arrow">→</div>
+    <div class="step-card tilt-card reveal reveal-delay-1">
+      <div class="tilt-card-inner">
+      <div class="step-icon" style="background:#F0FDF4;color:#15803D">📲</div>
+      <div class="step-num">02</div>
+      <h3>Get your QR card</h3>
+      <p>Download your unique QR code. Print it on a wristband, wallet card, or keep it on your phone.</p>
+      </div>
+    </div>
+    <div class="step-arrow">→</div>
+    <div class="step-card tilt-card reveal reveal-delay-2">
+      <div class="tilt-card-inner">
+      <div class="step-icon" style="background:#FEF9C3;color:#A16207">🚨</div>
+      <div class="step-num">03</div>
+      <h3>Responder scans</h3>
+      <p>In an emergency, a first responder scans your QR, enters the one-time code, and sees your critical info instantly.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Security section -->
+<section class="section section-alt" id="security">
+  <div class="section-eyebrow">Security</div>
+  <h2 class="section-title">Three layers. Zero compromises.</h2>
+  <p class="section-sub">Your data is encrypted before it ever touches our database. Even if the database were stolen, it would be completely unreadable.</p>
+
+<div class="security-grid">
+    <div class="sec-card tilt-card reveal">
+      <div class="tilt-card-inner">
+      <div class="sec-icon">🔐</div>
+      <h3>AES-256-GCM Encryption</h3>
+      <p>The same standard used by banks and governments. Your record is encrypted with a key that is never stored — it is re-derived on demand from your unique profile ID.</p>
+      </div>
+    </div>
+    <div class="sec-card tilt-card reveal reveal-delay-1">
+      <div class="tilt-card-inner">
+      <div class="sec-icon">📱</div>
+      <h3>TOTP One-Time Password</h3>
+      <p>Every access attempt requires a 6-digit code that rotates every 30 seconds. An expired or wrong code grants nothing — and gets logged.</p>
+      </div>
+    </div>
+    <div class="sec-card tilt-card reveal reveal-delay-2">
+      <div class="tilt-card-inner">
+      <div class="sec-icon">🛡</div>
+      <h3>SHA-256 Tamper Detection</h3>
+      <p>A fingerprint of your record is stored at registration. After every decryption, we recompute it. If a single byte has changed, access is denied immediately.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- What responders see -->
+<section class="section" id="responders">
+  <div class="section-eyebrow">For first responders</div>
+  <h2 class="section-title">Critical info. No login required.</h2>
+  <p class="section-sub">Responders don't need an account. They scan, enter the code shown on screen, and immediately see what matters most in an emergency.</p>
+
+<div class="record-preview reveal">
+    <div class="preview-header">🏥 Emergency Medical Record <span class="preview-badge">Verified</span></div>
+    <div class="preview-grid">
+      <div class="preview-block critical"><div class="preview-label">Blood Type</div><div class="preview-val">O+</div></div>
+      <div class="preview-block critical"><div class="preview-label">Patient Name</div><div class="preview-val">Patient Name</div></div>
+      <div class="preview-block"><div class="preview-label">⚠️ Allergies</div><div class="preview-val">Penicillin, Latex</div></div>
+      <div class="preview-block"><div class="preview-label">🫀 Conditions</div><div class="preview-val">Type 2 Diabetes</div></div>
+      <div class="preview-block"><div class="preview-label">💊 Medications</div><div class="preview-val">Metformin 500mg</div></div>
+      <div class="preview-block contact"><div class="preview-label">📞 Emergency Contact</div><div class="preview-val">Patient Name · +254 700 000 000</div></div>
+    </div>
+    <div class="preview-footer">🔒 Decrypted via AES-256-GCM · SHA-256 integrity verified · Access logged</div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <h2>Ready to protect yourself?</h2>
+  <p>Registration takes 2 minutes. Your data is encrypted before it leaves your browser.</p>
+  <a href="{{ url_for('patient.register_form') }}" class="btn btn-primary btn-lg">Create your free profile</a>
+</section>
+
+{% endblock %}

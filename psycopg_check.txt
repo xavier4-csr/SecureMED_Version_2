@@ -1,0 +1,1 @@
+psycopg2 version: 2.9.12 (dt dec pq3 ext lo64)
